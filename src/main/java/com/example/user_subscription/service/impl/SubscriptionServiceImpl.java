@@ -28,7 +28,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     private final UserRepository userRepository;
     private final SubscriptionMapper subscriptionMapper;
     @Override
-    @Transactional(timeout = 3, rollbackFor = {UserNotFoundException.class, SubscriptionConflictException.class})
+    @Transactional()
     public SubscriptionDto addSubscription(Long userId, SubscriptionDto subscriptionDto) {
         if (userId == null || userId <= 0) {
             throw new UserIllegalArgumentException("ID пользователя должно быть положительным числом");
@@ -63,7 +63,6 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    @Transactional(readOnly = true, timeout = 3, rollbackFor = {UserNotFoundException.class})
     public List<SubscriptionDto> getUserSubscriptions(Long userId) {
         if (userId == null || userId <= 0) {
             throw new UserIllegalArgumentException("ID пользователя должно быть положительным числом");
@@ -81,7 +80,7 @@ public class SubscriptionServiceImpl implements SubscriptionService {
     }
 
     @Override
-    @Transactional(timeout = 3, rollbackFor = {UserNotFoundException.class})
+    @Transactional()
     public void deleteSubscription(Long userId, Long subscriptionId) {
         if (userId == null || userId <= 0 ) {
             throw new UserIllegalArgumentException("Неверный ID пользователя");
