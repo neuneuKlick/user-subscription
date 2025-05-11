@@ -1,9 +1,6 @@
 package com.example.user_subscription.service.impl;
 import com.example.user_subscription.dto.UserDto;
-import com.example.user_subscription.exception.exceptions.ConflictException;
-import com.example.user_subscription.exception.exceptions.EmptyResultDataAccessException;
-import com.example.user_subscription.exception.exceptions.ResourceNotFoundException;
-import com.example.user_subscription.exception.exceptions.UserAlreadyExistsException;
+import com.example.user_subscription.exception.exceptions.user.*;
 import com.example.user_subscription.mapper.UserMapper;
 import com.example.user_subscription.model.User;
 import com.example.user_subscription.repository.UserRepository;
@@ -26,7 +23,7 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
 
     @Override
-    @Transactional(timeout = 3, rollbackFor = {UserAlreadyExistsException.class})
+    @Transactional()
     public UserDto createUser(UserDto userDto) {
         if (userRepository.existsByEmail(userDto.getEmail())) {
             throw new UserAlreadyExistsException("Пользователь с email " + userDto.getEmail() + " уже существует");
@@ -37,38 +34,37 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    @Transactional(readOnly = true)
     public UserDto getUserById(Long id) {
         if (id == null || id <= 0) {
-            throw new IllegalArgumentException("ID пользователя должно быть положительным числом");
+            throw new UserIllegalArgumentException("ID пользователя должно быть положительным числом");
         }
 
         User user = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException("Пользователь с id: " + id + " не найден"));
+                .orElseThrow(() -> new UserNotFoundException("Пользователь с id: " + id + " не найден"));
 
         return userMapper.toDto(user);
     }
 
 
     @Override
-    @Transactional(timeout = 3, rollbackFor = {ResourceNotFoundException.class})
+    @Transactional()
     public UserDto updateUser(Long id, UserDto userDto) {
         if (id == null || id <= 0) {
-            throw new IllegalArgumentException("ID пользователя должно быть положительным числом");
+            throw new UserIllegalArgumentException("ID пользователя должно быть положительным числом");
         }
 
         if (userDto == null) {
-            throw new IllegalArgumentException("Данные пользователя не могут быть null");
+            throw new UserIllegalArgumentException("Данные пользователя не могут быть null");
         }
 
         User existingUser = userRepository.findById(id)
-                .orElseThrow(() -> new ResourceNotFoundException(
+                .orElseThrow(() -> new UserNotFoundException(
                         String.format("Пользователь с ID %d не найден", id)
                 ));
 
         if (userDto.getEmail() != null && !userDto.getEmail().equals(existingUser.getEmail())) {
             if (userRepository.existsByEmail(userDto.getEmail())) {
-                throw new ConflictException("Email " + userDto.getEmail() + " уже используется");
+                throw new UserConflictException("Email " + userDto.getEmail() + " уже используется");
             }
         }
 
@@ -85,30 +81,29 @@ public class UserServiceImpl implements UserService {
 
 
     @Override
-    @Transactional(timeout = 3, rollbackFor = {ResourceNotFoundException.class, DataAccessException.class})
+    @Transactional()
     public void deleteUser(Long id) {
         if (id == null || id <= 0) {
-            throw new IllegalArgumentException("ID пользователя должно быть положительным числом");
+            throw new UserIllegalArgumentException("ID пользователя должно быть положительным числом");
         }
 
         if (!userRepository.existsById(id)) {
-            throw new ResourceNotFoundException("Пользователь с ID " + id + " не найден");
+            throw new UserNotFoundException("Пользователь с ID " + id + " не найден");
         }
 
         try {
             userRepository.deleteById(id);
             log.info("Пользователь с ID {} успешно удален", id);
-        } catch (EmptyResultDataAccessException e) {
+        } catch (UserEmptyResultDataAccessException e) {
             log.error("Ошибка при удалении пользователя: {}", e.getMessage());
-            throw new ResourceNotFoundException("Пользователь уже был удален");
+            throw new UserNotFoundException("Пользователь уже был удален");
         } catch (Exception e) {
             log.error("Неожиданная ошибка при удалении: {}", e.getMessage());
-            throw new DataAccessException("Ошибка при удалении пользователя") {};
+            throw new UserDataAccessException("Ошибка при удалении пользователя") {};
         }
     }
 
     @Override
-    @Transactional(readOnly = true)
     public List<UserDto> getAllUsers() {
         List<User> users = userRepository.findAll();
         return userMapper.toDtoList(users);

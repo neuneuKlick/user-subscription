@@ -1,8 +1,7 @@
 package com.example.user_subscription.service.impl;
 
 import com.example.user_subscription.dto.SubscriptionDto;
-import com.example.user_subscription.exception.exceptions.ForbiddenException;
-import com.example.user_subscription.exception.exceptions.ResourceNotFoundException;
+import com.example.user_subscription.exception.exceptions.user.UserNotFoundException;
 import com.example.user_subscription.mapper.SubscriptionMapper;
 import com.example.user_subscription.model.Subscription;
 import com.example.user_subscription.model.User;
@@ -126,7 +125,7 @@ class SubscriptionServiceImplTest {
         when(userRepository.findById(userId)).thenReturn(Optional.of(user));
         when(subscriptionRepository.findById(subscriptionId)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () ->
+        assertThrows(UserNotFoundException.class, () ->
                 subscriptionService.deleteSubscription(userId, subscriptionId));
 
         verify(subscriptionRepository).findById(subscriptionId);

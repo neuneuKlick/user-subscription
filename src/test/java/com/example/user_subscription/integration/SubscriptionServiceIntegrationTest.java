@@ -1,7 +1,6 @@
 package com.example.user_subscription.integration;
 
 import com.example.user_subscription.dto.SubscriptionDto;
-import com.example.user_subscription.exception.exceptions.ConflictException;
 import com.example.user_subscription.mapper.SubscriptionMapper;
 import com.example.user_subscription.model.Subscription;
 import com.example.user_subscription.model.User;

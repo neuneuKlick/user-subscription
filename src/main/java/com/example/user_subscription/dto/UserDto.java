@@ -3,8 +3,6 @@ package com.example.user_subscription.dto;
 import jakarta.validation.constraints.*;
 import lombok.*;
 
-import java.util.List;
-
 @Data
 @AllArgsConstructor
 @NoArgsConstructor

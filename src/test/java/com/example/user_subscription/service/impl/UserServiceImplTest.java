@@ -1,8 +1,8 @@
 package com.example.user_subscription.service.impl;
 
 import com.example.user_subscription.dto.UserDto;
-import com.example.user_subscription.exception.exceptions.ResourceNotFoundException;
-import com.example.user_subscription.exception.exceptions.UserAlreadyExistsException;
+import com.example.user_subscription.exception.exceptions.user.UserNotFoundException;
+import com.example.user_subscription.exception.exceptions.user.UserAlreadyExistsException;
 import com.example.user_subscription.mapper.UserMapper;
 import com.example.user_subscription.model.User;
 import com.example.user_subscription.repository.UserRepository;
@@ -78,7 +78,7 @@ class UserServiceImplTest {
         Long userId = 999L;
         when(userRepository.findById(userId)).thenReturn(Optional.empty());
 
-        assertThrows(ResourceNotFoundException.class, () -> userService.getUserById(userId));
+        assertThrows(UserNotFoundException.class, () -> userService.getUserById(userId));
     }
 
     @Test
@@ -118,7 +118,7 @@ class UserServiceImplTest {
         Long userId = 999L;
         when(userRepository.existsById(userId)).thenReturn(false);
 
-        assertThrows(ResourceNotFoundException.class,
+        assertThrows(UserNotFoundException.class,
                 () -> userService.deleteUser(userId));
     }
 
